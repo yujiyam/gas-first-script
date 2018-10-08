@@ -58,27 +58,33 @@ function doPost(e) {
     var address = json.events[0].message.address;
     var latitude = json.events[0].message.latitude;
     var longitude = json.events[0].message.longitude;
-    var location = [latitude,longitude]
-    var arrRest = GetGNAVIData(latitude,longitude);
+    var location = [latitude,longitude];
+    var arrRest = GetGNAVIData(latitude,longitude,"3",4);
     console.log(arrRest);
-    messages = reply_messages.map(function(v) {
-      return {
-              "type": "template",
-              "altText": "this is a confirm template",
-              "template": {
-              "type": "buttons",
-              "text": "U are here:" + latitude + ":" + longitude,
-              "actions": //arrRest
-               [
-                {
-                  "type": "uri",
-                  "label": "test",
-                  "uri": "line://nv/location"
-                }
-              ]
-            }
-           }
-      });
+    messages = arrRest.map(function(v) {
+      return{
+        "type": "text",
+        "text": v
+      }
+    });
+    //messages = reply_messages.map(function(v) {
+      //return {
+      //        "type": "template",
+      //        "altText": "this is a confirm template",
+      //        "template": {
+      //        "type": "buttons",
+      //        "text": "U are here:" + latitude + ":" + longitude,
+      //        "actions": //arrRest
+      //         [
+      //          {
+      //            "type": "uri",
+      //            "label": "test",
+      //            "uri": "line://nv/location"
+      //          }
+      //      ]
+      //      }
+      //     }
+      //});
     
     
   } else if (json.events[0].message.type == "sticker") {
@@ -128,13 +134,13 @@ function GetGNAVIData(latitude,longitude,range,num) {
     jsonLength = num;
    }//3つまでを出力
 
-  //for (var i=0;i<jsonLength;i++){
+  for (var i=0;i<jsonLength;i++){
     // 出力したい情報を配列に入れていく
+    arrArea.push(json.rest[i].name);
     //arrArea.push({"type": "uri","label": json.rest[i].name,"uri": json.rest[i].url});
     //arrArea.push([json.rest[i].url,
     //              json.rest[i].name,
     //             ]);
-  //}
-  var name = json.rest[0].name;
-  return [json.rest[0].name];
+  }
+  return arrArea;
 }
