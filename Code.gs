@@ -3,7 +3,7 @@
 var CHANNEL_ACCESS_TOKEN = 'NP8ujA7QhRWpPQcM9lwWgX8rPgeWE4aexBvCh82bnp2eNpyHMy4yU+iV/iYegDEP/151+s86f5Yg21/0izKVql7LtngJB2vwjsKClLn9/f1c67FCFKwl5fA1b2vukUto1SFLwAnsMWujrRTGDvwrBAdB04t89/1O/w1cDnyilFU='; 
 var line_endpoint = 'https://api.line.me/v2/bot/message/reply';
 
-//https://developers.line.me/ja/reference/messaging-api/
+
 
 //ポストで送られてくるので、ポストデータ取得
 //JSONをパースする
@@ -27,7 +27,7 @@ function doPost(e) {
 
   if (json.events[0].message.type == "text"){
     user_message = json.events[0].message.text;
-    var messages = reply_messages.map(function(v) {
+    messages = reply_messages.map(function(v) {
       return {
               "type": "template",
               "altText": "this is a confirm template",
@@ -53,32 +53,32 @@ function doPost(e) {
               ]
             }
            }
-      });    
-    
-    //if ('かっこいい' == user_message) {
-    ////かっこいいと入力された際
-    //reply_messages = ['「' + user_message + '」ですね？\n' + '「' + user_message + '」はこちらになります。\n' + 'https://hogehoge.com',];
-
-    //} else if ('かわいい' == user_message) {
-    //  //かわいいと入力された際
-    //  reply_messages = ['「' + user_message + '」ですね？\n' + '「' + user_message + '」はこちらになります。\n' + 'https://hogehoge.com',];
-
-    //} else if ('普通' == user_message) {
-    //  //普通と入力された際
-    //  reply_messages = ['「' + user_message + '」ですね？\n' + '「' + user_message + '」はこちらになります。\n' + 'https://hogehoge.com',];
-    //} else if ('です' == user_message) {
-    //  //ですと入力された際
-    //  reply_messages = ['どんまい'];
-    //} else {
-    //  //かっこいい、かわいい、普通が入力されたときの処理
-    //  reply_messages = [user_message];
-    //}
-        
+      });       
   } else if (json.events[0].message.type == "location") {
     var address = json.events[0].message.address;
-    var ratitude = json.events[0].message.latitude;
+    var latitude = json.events[0].message.latitude;
     var longitude = json.events[0].message.longitude;
-    reply_messages = [address,ratitude,longitude,];  
+    var location = [latitude,longitude]
+    var arrRest = GetGNAVIData();
+    messages = reply_messages.map(function(v) {
+      return {
+              "type": "template",
+              "altText": "this is a confirm template",
+              "template": {
+              "type": "buttons",
+              "text": "Where do U now?",
+              "actions": [
+                {
+                  "type": "uri",
+                  "label": "locaton",
+                  "uri": "line://nv/location"
+                }
+              ]
+            }
+           }
+      });
+    
+    
   } else if (json.events[0].message.type == "sticker") {
     reply_messages = [json.events[0].message.packageId,];
   } else {
@@ -103,4 +103,35 @@ function doPost(e) {
     }),
   });
   return ContentService.createTextOutput(JSON.stringify({'content': 'post ok'})).setMimeType(ContentService.MimeType.JSON);  
+}
+
+function GetGNAVIData(latitude,longitude,range) {
+  var url = "https://api.gnavi.co.jp/RestSearchAPI/v3/?keyid=5a3c4e4079c7245added805e58a91e94";
+  latitude = (latitude == null) ? "35.0576" : latitude;
+  longitude = (longitude == null) ? "136.93" : longitude;
+  range = (range == null) ? "3" : range;
+  
+  var request = url + "&latitude=" + latitude + "&longitude=" + longitude + "&range=" + range;
+  var response = UrlFetchApp.fetch(request);
+  var json = JSON.parse(response.getContentText());
+
+  var jsonLength = Object.keys(json.rest).length;//ヒットした件数を取得する
+  var arrArea = [];//出力する値を入れるための配列
+
+  if(jsonLength < 1){
+    return;
+  }else if(jsonLength < 3){
+    jsonLength = jsonLength;
+  }else{
+    jsonLength = 3;
+   }//3つまでを出力
+
+  for (var i=0;i<jsonLength;i++){
+    // 出力したい情報を配列に入れていく
+    arrArea.push({"type": "uri","label": json.rest[i].name,"uri": json.rest[i].url});
+    //arrArea.push([json.rest[i].url,
+    //              json.rest[i].name,
+    //             ]);
+  }
+  return arrArea;
 }
