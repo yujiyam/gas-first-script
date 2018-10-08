@@ -59,18 +59,20 @@ function doPost(e) {
     var latitude = json.events[0].message.latitude;
     var longitude = json.events[0].message.longitude;
     var location = [latitude,longitude]
-    var arrRest = GetGNAVIData();
+    var arrRest = GetGNAVIData(latitude,longitude);
+    console.log(arrRest);
     messages = reply_messages.map(function(v) {
       return {
               "type": "template",
               "altText": "this is a confirm template",
               "template": {
               "type": "buttons",
-              "text": "Where do U now?",
-              "actions": [
+              "text": "U are here:" + latitude + ":" + longitude,
+              "actions": //arrRest
+               [
                 {
                   "type": "uri",
-                  "label": "locaton",
+                  "label": "test",
                   "uri": "line://nv/location"
                 }
               ]
@@ -105,12 +107,12 @@ function doPost(e) {
   return ContentService.createTextOutput(JSON.stringify({'content': 'post ok'})).setMimeType(ContentService.MimeType.JSON);  
 }
 
-function GetGNAVIData(latitude,longitude,range) {
+function GetGNAVIData(latitude,longitude,range,num) {
   var url = "https://api.gnavi.co.jp/RestSearchAPI/v3/?keyid=5a3c4e4079c7245added805e58a91e94";
   latitude = (latitude == null) ? "35.0576" : latitude;
   longitude = (longitude == null) ? "136.93" : longitude;
   range = (range == null) ? "3" : range;
-  
+  num = (num == null) ? 1 : num;
   var request = url + "&latitude=" + latitude + "&longitude=" + longitude + "&range=" + range;
   var response = UrlFetchApp.fetch(request);
   var json = JSON.parse(response.getContentText());
@@ -120,18 +122,19 @@ function GetGNAVIData(latitude,longitude,range) {
 
   if(jsonLength < 1){
     return;
-  }else if(jsonLength < 3){
+  }else if(jsonLength < num + 1){
     jsonLength = jsonLength;
   }else{
-    jsonLength = 3;
+    jsonLength = num;
    }//3つまでを出力
 
-  for (var i=0;i<jsonLength;i++){
+  //for (var i=0;i<jsonLength;i++){
     // 出力したい情報を配列に入れていく
-    arrArea.push({"type": "uri","label": json.rest[i].name,"uri": json.rest[i].url});
+    //arrArea.push({"type": "uri","label": json.rest[i].name,"uri": json.rest[i].url});
     //arrArea.push([json.rest[i].url,
     //              json.rest[i].name,
     //             ]);
-  }
-  return arrArea;
+  //}
+  var name = json.rest[0].name;
+  return [json.rest[0].name];
 }
