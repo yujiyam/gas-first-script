@@ -27,8 +27,7 @@ function doPost(e) {
 
   if (json.events[0].message.type == "text"){
     user_message = json.events[0].message.text;
-    messages = reply_messages.map(function(v) {
-      return {
+    messages = [{
               "type": "template",
               "altText": "this is a confirm template",
               "template": {
@@ -52,8 +51,7 @@ function doPost(e) {
                 }
               ]
             }
-           }
-      });       
+           }]
   } else if (json.events[0].message.type == "location") {
     var address = json.events[0].message.address;
     var latitude = json.events[0].message.latitude;
@@ -67,8 +65,7 @@ function doPost(e) {
     //    "text": v
     //  }
     //});
-    messages = reply_messages.map(function(v) {
-      return {
+    messages = [{
               "type": "template",
               "altText": "this is a confirm template",
               "template": {
@@ -76,14 +73,13 @@ function doPost(e) {
               "text": "These are Nearest Restaurant!",
               "actions": arrRest
             }
-           }
-      });
+           }]
     
     
   } else if (json.events[0].message.type == "sticker") {
-    reply_messages = [json.events[0].message.packageId,];
+    messages = ReturnJSONFlexMessage();
   } else {
-    reply_messages = [json.events[0].message.type,];
+    messages = [json.events[0].message.type,];
   }
   // Tips&Care：reply_massage は　[,]　で囲む必要がある
   // Tips&Care：line のメッセ時で[,]の,はメッセージを別々で送ってくれる！
@@ -159,41 +155,46 @@ function PushMessage()
   })
 }
 
+function a()
+{
+  var a = ReturnJSONFlexMessage();
+  var b = "test";
+}
 function ReturnJSONFlexMessage()
 {
-  return {
-    "type": "carousel",
-    "contents": [
-      {
-      "type": "bubble",
-      "body": {
-        "type":"box",
-        "layout":"vertical",
-        "contents":[
-            {
-              "type":"text",
-              "text": "test1",
-              "wrap": "true"
-            }
-          ]
-        }
-      },
-      {
-      "type": "bubble",
-      "body": {
-        "type":"box",
-        "layout":"vertical",
-        "contents":[
-            {
-              "type":"text",
-              "text": "test2",
-              "wrap": "true"
-            }
-          ]
-        }
-      }      
-    ]
-  }
+  return [{
+    "type": "flex",
+    "altText": "this is a flex message",
+    "contents":{
+      "type": "carousel",
+      "contents": [{
+        "type": "bubble",
+        "body": {
+          "type":"box",
+          "layout":"vertical",
+          "contents":[
+              {
+                "type":"text",
+                "text": "test1"
+              }
+            ]//contents
+          }//body
+          },
+          {
+          "type": "bubble",
+          "body": {
+          "type":"box",
+          "layout":"vertical",
+          "contents":[
+             {
+                "type":"text",
+                "text": "test1",
+              }
+            ]
+          }        
+        }]
+      }
+  }]
 }
 
 function GetTrainDerayInformation()
