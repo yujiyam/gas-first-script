@@ -139,12 +139,21 @@ function GetGNAVIDataforFlexMessage(latitude,longitude,range,num) {
     //arrArea.push(json.rest[i].name);
     var name = json.rest[i].name;
     var url = json.rest[i].url_mobile;
-    var gnavi_url = "https://api.gnavi.co.jp/api/img/credit/api_265_65.gif"
+    var gnavi_url = "https://api.gnavi.co.jp/api/img/credit/api_225_100.gif"
     var img_url = (json.rest[i].image_url.shop_image1 == "") ? gnavi_url : json.rest[i].image_url.shop_image1;
     arrArea.push(
       {
         "type": "bubble",
-        "header": {
+        "hero": {
+          "type": "image",
+          "url": img_url,
+          "size": "md", 
+           "action":{
+             "type": "uri",
+             "uri": url            
+          }          
+         },
+        "body": {
           "type" : "box",
           "layout": "vertical",
           "contents":[
@@ -154,26 +163,20 @@ function GetGNAVIDataforFlexMessage(latitude,longitude,range,num) {
              "align": "center",
             }
           ]
-        },
-        "hero": {
-          "type": "image",
-          "url": img_url,
-          "size": "md",          
-        },
-        "body": {
-          "type":"box",
-          "layout":"vertical",
-          "contents": [
-          {
-           "type":"button",
-           "style": "secondary",
-           "action":{
-             "type": "uri",
-             "label": "Go",
-             "uri": url            
-          }
-        }]
         }
+        //"body": {
+        //  "type":"box",
+        //  "layout":"vertical",
+        //  "contents": [
+        //  {
+        //   "type":"button",
+        //   "style": "secondary",
+        //   "action":{
+        //     "type": "uri",
+        //     "label": "Go",
+        //     "uri": url            
+        //  }
+        //}]
       });
    }
   var returnMessage = 
