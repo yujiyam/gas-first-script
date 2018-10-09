@@ -155,11 +155,6 @@ function PushMessage()
   })
 }
 
-function a()
-{
-  var a = ReturnJSONFlexMessage();
-  var b = "test";
-}
 function ReturnJSONFlexMessage()
 {
   return [{
