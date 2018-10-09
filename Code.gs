@@ -27,21 +27,26 @@ function doPost(e) {
 
   if (json.events[0].message.type == "text"){
     user_message = json.events[0].message.text;
-    messages = [{
-              "type": "template",
-              "altText": "this is a confirm template",
-              "template": {
-              "type": "buttons",
-              "text": "Where do U now?",
-              "actions": [
-                {
-                  "type": "uri",
-                  "label": "locaton",
-                  "uri": "line://nv/location"
-                }
-              ]
-            }
-           }]
+    if (user_message == "遅延")
+    {
+      messages = GetTrainDerayInformation();
+    }else{
+      messages = [{
+                "type": "template",
+                "altText": "this is a confirm template",
+                "template": {
+                "type": "buttons",
+                "text": "Where do U now?",
+                "actions": [
+                  {
+                    "type": "uri",
+                    "label": "locaton",
+                    "uri": "line://nv/location"
+                  }
+                ]
+              }
+             }]
+     }
   } else if (json.events[0].message.type == "location") {
     var address = json.events[0].message.address;
     var latitude = json.events[0].message.latitude;
@@ -52,7 +57,6 @@ function doPost(e) {
       {"type":"text","text":"1kmの範囲にあるの店だよ！"},
       GetGNAVIDataforFlexMessage(latitude,longitude,"3",10)
     ]
-    console.log(messages);
     
   } else if (json.events[0].message.type == "sticker") {
     //messages = ReturnJSONFlexMessage();
@@ -60,6 +64,7 @@ function doPost(e) {
   } else {
     messages = [json.events[0].message.type,];
   }
+  console.log(messages);
   // Tips&Care：reply_massage は　[,]　で囲む必要がある
   // Tips&Care：line のメッセ時で[,]の,はメッセージを別々で送ってくれる！
   
@@ -164,19 +169,6 @@ function GetGNAVIDataforFlexMessage(latitude,longitude,range,num) {
             }
           ]
         }
-        //"body": {
-        //  "type":"box",
-        //  "layout":"vertical",
-        //  "contents": [
-        //  {
-        //   "type":"button",
-        //   "style": "secondary",
-        //   "action":{
-        //     "type": "uri",
-        //     "label": "Go",
-        //     "uri": url            
-        //  }
-        //}]
       });
    }
   var returnMessage = 
@@ -254,6 +246,12 @@ function GetTrainDerayInformation()
  var url  = "https://rti-giken.jp/fhc/api/train_tetsudo/delay.json"
  var response = UrlFetchApp.fetch(url);
  var json = JSON.parse(response.getContentText());
- 
- return json;
+ var jsonLength = Object.keys(json).length;
+ var chienLine = "------------------";
+ var arrChien = [{"type":"text","text":"遅延情報だよ～"}];
+ for (var i=0;i<jsonLength;i++){
+   chienLine　+= "\n" + json[i].name
+ }
+ arrChien.push({"type":"text","text":chienLine})
+ return arrChien;
 }
