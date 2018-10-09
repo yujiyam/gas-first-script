@@ -2,7 +2,7 @@
 //LINE developerで登録をした、自分のCHANNEL_ACCESS_TOKENを入れて下さい
 var CHANNEL_ACCESS_TOKEN = 'NP8ujA7QhRWpPQcM9lwWgX8rPgeWE4aexBvCh82bnp2eNpyHMy4yU+iV/iYegDEP/151+s86f5Yg21/0izKVql7LtngJB2vwjsKClLn9/f1c67FCFKwl5fA1b2vukUto1SFLwAnsMWujrRTGDvwrBAdB04t89/1O/w1cDnyilFU='; 
 var line_endpoint = 'https://api.line.me/v2/bot/message/reply';
-
+var line_push_url = 'https://api.line.me/v2/bot/message/multicast';
 
 
 //ポストで送られてくるので、ポストデータ取得
@@ -111,7 +111,7 @@ function GetGNAVIData(latitude,longitude,range,num) {
   latitude = (latitude == null) ? "35.0576" : latitude;
   longitude = (longitude == null) ? "136.93" : longitude;
   range = (range == null) ? "3" : range;
-  num = (num == null) ? 1 : num;
+  num = (num == null) ? 8 : num;
   var request = url + "&latitude=" + latitude + "&longitude=" + longitude + "&range=" + range;
   var response = UrlFetchApp.fetch(request);
   var json = JSON.parse(response.getContentText());
@@ -136,4 +136,71 @@ function GetGNAVIData(latitude,longitude,range,num) {
     //             ]);
   }
   return arrArea;
+}
+
+//2018/10/10 Can't send message because trucated server response
+function PushMessage()
+{
+  var message = ReturnJSONFlexMessage;
+  UrlFetchApp.fetch(line_push_url,
+  {
+    "hearder":{
+      "Content-Type": "application/json; charset=UTF-8",
+      "Authorization": "Bearer " + CHANNEL_ACCESS_TOKEN,
+    },
+    "method": "POST",
+    "payload": JSON.stringify({
+      //"to": "mememori1986",
+      "messages" : [{
+        "type": "text",
+        "text": "tesst1"
+      }]
+    })
+  })
+}
+
+function ReturnJSONFlexMessage()
+{
+  return {
+    "type": "carousel",
+    "contents": [
+      {
+      "type": "bubble",
+      "body": {
+        "type":"box",
+        "layout":"vertical",
+        "contents":[
+            {
+              "type":"text",
+              "text": "test1",
+              "wrap": "true"
+            }
+          ]
+        }
+      },
+      {
+      "type": "bubble",
+      "body": {
+        "type":"box",
+        "layout":"vertical",
+        "contents":[
+            {
+              "type":"text",
+              "text": "test2",
+              "wrap": "true"
+            }
+          ]
+        }
+      }      
+    ]
+  }
+}
+
+function GetTrainDerayInformation()
+{
+ var url  = "https://rti-giken.jp/fhc/api/train_tetsudo/delay.json"
+ var response = UrlFetchApp.fetch(url);
+ var json = JSON.parse(response.getContentText());
+ 
+ return json;
 }
