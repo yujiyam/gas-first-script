@@ -26,12 +26,13 @@ function doPost(e) {
 
 
   if (json.events[0].message.type == "text"){
+    var id = json.events[0].source.userId;
     user_message = json.events[0].message.text;
     if (user_message == "遅延")
     {
       messages = GetTrainDerayInformation();
     }else{
-      messages = [{
+      messages = [{"type":"text","text":id},{
                 "type": "template",
                 "altText": "this is a confirm template",
                 "template": {
@@ -41,7 +42,7 @@ function doPost(e) {
                   {
                     "type": "uri",
                     "label": "locaton",
-                    "uri": "line://nv/location"
+                    "uri": "https://gmp-test.mybluemix.net/"
                   }
                 ]
               }
@@ -54,7 +55,7 @@ function doPost(e) {
     var location = [latitude,longitude];
     //var arrRest = GetGNAVIData(latitude,longitude,"3",4);
     var messages = [
-      {"type":"text","text":"1kmの範囲にあるの店だよ！"},
+      {"type":"text","text":"1kmの範囲にある店だよ！"},
       GetGNAVIDataforFlexMessage(latitude,longitude,"3",10)
     ]
     
